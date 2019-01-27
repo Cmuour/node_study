@@ -5,7 +5,7 @@ class WriteStream extends EventEmitter{
     constructor(path,options){
         super(path,options);
         this.path = path;
-        this.flags = options.flags || true;
+        this.flags = options.flags || 'w';
         this.encoding = options.encoding || 'utf8';
         this.autoClose = options.autoClose;
         this.mode = options.mode || 0o666;
@@ -31,7 +31,7 @@ class WriteStream extends EventEmitter{
         })
     }
     write(chunk,encoding,cb){
-        chunk = Buffer.isBuffer(chunk)?chunk:Buffer.from(chunk,this.encofing);
+        chunk = Buffer.isBuffer(chunk)?chunk:Buffer.from(chunk,this.encoding);
         let len = chunk.length;
         // 缓存区的长度加上当前写入的长度
         this.length += len;
@@ -43,19 +43,19 @@ class WriteStream extends EventEmitter{
             })
         }else{ // 直接调用底层的方法进行写入
             this.writing = true;
-            this._write(chunk,encoding,()=>this.cliearBuffer());
+            this._write(chunk,encoding,()=>this.clearBuffer());
         }
         return ret;
     }
-    cliearBuffer(){
+    clearBuffer(){
         // 取出缓存区中的第一个buffer
         let data = this.buffers.shift();
         if(data){
-            this._write(data.chunk,data.encoding,()=>this.cliearBuffer())
+            this._write(data.chunk,data.encoding,()=>this.clearBuffer())
         }else{
             this.writing = false;
             // 缓存区清空
-            this.emit('drain')
+            this.emit('drain');
         }
     }
     _write(chunk,encoding,cb){
