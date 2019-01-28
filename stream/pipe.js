@@ -2,7 +2,7 @@ const ReadStream = require('./readStream');
 const WriteStream = require('./writeStream');
 
 let rs = new ReadStream('./1.txt',{
-    start:3,
+    start:5,
     end:8,
     highWaterMark:3
 })
